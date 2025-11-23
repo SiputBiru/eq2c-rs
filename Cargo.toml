@@ -1,0 +1,17 @@
+[package]
+name = "skybox_converter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.53", features = ["derive"] }
+glam = "0.30.9"
+image = { version = "0.25.9", features = ["hdr", "exr"] }
+rayon = "1.11.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
