@@ -1,9 +1,8 @@
-// pub mod astc;
-// pub mod png_ldr;
 use image::Rgb32FImage;
 use std::path::Path;
 
-pub mod png_ldr;
+pub mod exr;
+pub mod png;
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -17,7 +16,7 @@ pub trait SkyboxEncoder {
 
 pub fn get_encoder(format: OutputFormat) -> Box<dyn SkyboxEncoder> {
     match format {
-        OutputFormat::Png => Box::new(png_ldr::PngLdrEncoder),
-        OutputFormat::Exr => panic!("EXR not implemented yet!"),
+        OutputFormat::Png => Box::new(png::PngEncoder),
+        OutputFormat::Exr => Box::new(exr::ExrEncoder),
     }
 }

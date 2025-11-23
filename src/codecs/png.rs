@@ -2,9 +2,9 @@ use super::SkyboxEncoder;
 use image::{ImageBuffer, Rgb, Rgb32FImage};
 use std::path::Path;
 
-pub struct PngLdrEncoder;
+pub struct PngEncoder;
 
-impl SkyboxEncoder for PngLdrEncoder {
+impl SkyboxEncoder for PngEncoder {
     fn encode(&self, image: &Rgb32FImage, output_path: &Path) -> Result<(), String> {
         let width = image.width();
         let height = image.height();
@@ -12,7 +12,7 @@ impl SkyboxEncoder for PngLdrEncoder {
         let mut ldr_buffer: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
 
         for (x, y, pixel) in image.enumerate_pixels() {
-            let hdr = pixel.0;
+            let hdr = pixel.0; // [r, g, b]
 
             let tm_r = hdr[0] / (hdr[0] + 1.0);
             let tm_g = hdr[1] / (hdr[1] + 1.0);

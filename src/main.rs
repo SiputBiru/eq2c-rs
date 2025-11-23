@@ -56,6 +56,7 @@ fn main() {
     // 2. Process Layout (The Heavy Math)
     println!("Generating layout...");
 
+    // Map CLI Enum -> Library Enum
     let layout_type = match args.layout {
         LayoutArg::Cross => layouts::LayoutType::Cross,
         LayoutArg::StripH => layouts::LayoutType::StripHorizontal,
