@@ -31,9 +31,16 @@ You need the Rust toolchain installed. If you don't have it, get it at [rustup.r
 2.  **Build for Release:**
 
     > **Note:** Always build in release mode! Debug builds are significantly larger and slower.
+    -
 
     ```bash
     cargo build --release
+    ```
+
+    - Specific Build:
+
+    ```bash
+    cargo build --target x86_64-pc-windows-gnu --release
     ```
 
 The executable will be located at `./target/release/skybox_converter`.
