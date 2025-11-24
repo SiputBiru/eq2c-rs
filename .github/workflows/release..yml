@@ -19,8 +19,8 @@ jobs:
             asset_name: eq2c-linux-amd64
           - os: windows-latest
             asset_name: eq2c-windows-amd64.exe
-          - os: macos-latest
-            asset_name: eq2c-macos-amd64
+          # - os: macos-latest
+          #   asset_name: eq2c-macos-amd64
 
     steps:
       - name: Checkout Code

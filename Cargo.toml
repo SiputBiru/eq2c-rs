@@ -1,6 +1,6 @@
 [package]
 name = "eq2c"
-version = "0.1.0-alpha"
+version = "0.1.2-alpha"
 edition = "2024"
 
 [dependencies]
