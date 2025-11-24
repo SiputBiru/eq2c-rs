@@ -82,6 +82,14 @@ Keep the data in floating point (Linear HDR) and increase face resolution to 204
 ./skybox_converter -i input.hdr -o sky_hq.exr --format exr --size 2048
 ```
 
+### Tonemap Types
+
+Change the tonemap output to your liking (ACES, Khronos PBR Neutral, Reinhard, AgX, Linear).
+
+```bash
+./skybox_converter -i input.hdr -o sky_hq.exr --format exr --t aces
+```
+
 ## 🏗️ Project Structure
 
 ```
