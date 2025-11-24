@@ -47,7 +47,7 @@ You need the Rust toolchain installed. If you don't have it, get it at [rustup.r
     cargo build --target x86_64-pc-windows-gnu --release
     ```
 
-The executable will be located at `./target/release/skybox_converter`.
+The executable will be located at `./target/release/skybox_converter`
 
 ---
 
