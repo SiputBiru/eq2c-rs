@@ -1,5 +1,8 @@
 # 🌤️ eq2c
 
+[![CI](https://github.com/SiputBiru/eq2c-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/SiputBiru/eq2c-rs/actions)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SiputBiru/eq2c-rs?style=flat-square)](https://github.com/SiputBiru/eq2c-rs/releases)
+
 eq2c (Equi-to-Cube) is a high-performance CLI tool written in Rust to convert Equirectangular HDRI images into Cubemaps.
 It supports high-precision floating-point processing, multithreaded rendering, and automatic tone mapping for LDR outputs.
 
