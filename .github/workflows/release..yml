@@ -1,48 +1,60 @@
 name: Release
 
-on:
-  push:
-    tags:
-      - "v*"
-
 permissions:
   contents: write
 
+on:
+  push:
+    tags:
+      - "eq2c-v*"
+
+env:
+  CARGO_TERM_COLOR: always
+  BINARY_NAME: eq2c
+
 jobs:
   build-and-release:
-    name: Build Release
+    name: Release - ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
+            platform: linux
+            target: x86_64-unknown-linux-gnu
             asset_name: eq2c-linux-amd64
           - os: windows-latest
+            platform: windows
+            target: x86_64-pc-windows-msvc
             asset_name: eq2c-windows-amd64.exe
-          # - os: macos-latest
-          #   asset_name: eq2c-macos-amd64
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: "${{ matrix.target }}"
 
-      - name: Build (Release)
-        run: cargo build --release --verbose
+      - name: Build Binary
+        run: cargo build --release --target ${{ matrix.target }} --verbose
 
-      - name: Rename Binary (Unix)
-        if: matrix.os != 'windows-latest'
-        run: mv target/release/eq2c target/release/${{ matrix.asset_name }}
+      - name: Prepare Asset
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform }}" == "windows" ]; then
+            BIN_PATH="target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}.exe"
+          else
+            BIN_PATH="target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}"
+          fi
 
-      - name: Rename Binary (Windows)
-        if: matrix.os == 'windows-latest'
-        run: mv target/release/eq2c.exe target/release/${{ matrix.asset_name }}
+          mv "$BIN_PATH" "${{ matrix.asset_name }}"
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Create Release & Upload Assets
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          generate_release_notes: true
           files: |
-            target/release/${{ matrix.asset_name }}
+            ${{ matrix.asset_name }}
