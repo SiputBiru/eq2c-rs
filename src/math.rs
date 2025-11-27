@@ -51,3 +51,26 @@ pub fn bilerp(v00: Vec3, v10: Vec3, v01: Vec3, v11: Vec3, tx: f32, ty: f32) -> V
 
     top.lerp(bottom, ty)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_face_uv_to_direction_front() {
+        let face = CubeFace::Front;
+        let dir = face_uv_to_dir(face, 0.5, 0.5);
+
+        assert!((dir.z - 1.0).abs() < 0.0001);
+        assert!(dir.x.abs() < 0.0001);
+        assert!(dir.y.abs() < 0.0001);
+    }
+
+    #[test]
+    fn test_face_uv_to_direction_right() {
+        let face = CubeFace::Right;
+        let dir = face_uv_to_dir(face, 0.5, 0.5);
+
+        assert!((dir.x - 1.0).abs() < 0.0001);
+    }
+}

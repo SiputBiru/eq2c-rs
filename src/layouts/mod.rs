@@ -1,19 +1,26 @@
 use image::Rgb32FImage;
 pub mod cross;
+pub mod separate;
 pub mod strip;
+
+pub enum LayoutOutput {
+    Single(Rgb32FImage),
+    Frames(Vec<(CubeFace, Rgb32FImage)>),
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LayoutType {
     Cross,
     StripHorizontal,
     StripVertical,
+    Separate,
 }
 
 pub trait SkyboxLayout {
-    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> Rgb32FImage;
+    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> LayoutOutput;
 }
 
-pub fn generate_layout(layout: LayoutType, source: &Rgb32FImage, face_size: u32) -> Rgb32FImage {
+pub fn generate_layout(layout: LayoutType, source: &Rgb32FImage, face_size: u32) -> LayoutOutput {
     let processor: Box<dyn SkyboxLayout> = match layout {
         LayoutType::Cross => Box::new(cross::CrossLayout),
 
@@ -24,6 +31,8 @@ pub fn generate_layout(layout: LayoutType, source: &Rgb32FImage, face_size: u32)
         LayoutType::StripVertical => Box::new(strip::StripLayout {
             direction: strip::StripDirection::Vertical,
         }),
+
+        LayoutType::Separate => Box::new(separate::SeparateLayout),
     };
 
     processor.generate(source, face_size)

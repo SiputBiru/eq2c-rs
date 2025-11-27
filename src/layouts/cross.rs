@@ -1,11 +1,11 @@
-use super::{SkyboxLayout, render_all_faces};
+use super::{LayoutOutput, SkyboxLayout, render_all_faces};
 use crate::math::CubeFace;
 use image::{ImageBuffer, Rgb32FImage};
 
 pub struct CrossLayout;
 
 impl SkyboxLayout for CrossLayout {
-    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> Rgb32FImage {
+    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> LayoutOutput {
         let rendered_faces = render_all_faces(source, face_size);
 
         let width = face_size * 4;
@@ -30,6 +30,6 @@ impl SkyboxLayout for CrossLayout {
             }
         }
 
-        final_image
+        LayoutOutput::Single(final_image)
     }
 }

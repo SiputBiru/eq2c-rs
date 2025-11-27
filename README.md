@@ -15,13 +15,14 @@ It supports high-precision floating-point processing, multithreaded rendering, a
   - `cross`: Standard unfolded cube cross.
   - `strip-h`: Horizontal strip ($6 \times 1$).
   - `strip-v`: Vertical strip ($1 \times 6$).
+  - `Separate`: output 6 file for each faces.
 - **🔍 Quality:** Uses Bilinear Interpolation for smooth sampling.
 - **🎨 Tonemap:** Various tonemap options for the output file.
+  - `Linear` or `None` Simple clamping system.
   - `ACES` Source: http://www.oscars.org/science-technology/sci-tech-projects/aces
   - `Khronos PBR Neutral` Source: https://github.com/KhronosGroup/ToneMapping/blob/main/PBR_Neutral/pbrNeutral.glsl
   - `Reinhard` Source: https://www-old.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
-  - `AgX` Source: Coming Soon.
-  - `Linear` or `None` Simple clamping system.
+  - `AgX` Still in testing, need more research still.
 
 ---
 
@@ -58,29 +59,46 @@ The executable will be located at `./target/release/eq2c`
 ## 📖 Usage
 
 You can run the tool directly via cargo or use the compiled binary.
-if using the compiled binary use **./eq2c** or **cargo run --**
+if using the compiled binary use **eq2c** or **cargo run --**
 
 ### Basic Conversion
 
 Convert an HDR image to a standard PNG cubemap (Cross layout, 512px faces).
 
 ```bash
-./eq2c -i input.hdr -o output.png
+eq2c -i input.hdr -o output.png
 ```
 
 ### Change Output Layout
 
-Generate a Horizontal Strip (6 x 1) instead of cross.
+- Generate a Horizontal Strip (6 x 1) instead of cross.
 
 ```bash
-./eq2c -i input.exr -o sky_strip.png --layout strip-h
+eq2c -i input.exr -o sky_strip.png --layout strip-h
 ```
 
-Generate a Vertical Strip (1 x 6).
+- Generate a Vertical Strip (1 x 6).
 
 ```bash
-./eq2c -i input.exr -o strip_v.png --layout strip-v
+eq2c -i input.exr -o strip_v.png --layout strip-v
 ```
+
+- Generate Separate faces in 6 files.
+
+```bash
+eq2c -i input.exr -o my_sky.png --layout separate
+```
+
+output:
+
+| Face   | File Name     | Meaning    |
+| ------ | ------------- | ---------- |
+| Right  | my_sky_px.png | Positive X |
+| Left   | my_sky_nx.png | Negative X |
+| Top    | my_sky_py.png | Positive Y |
+| Bottom | my_sky_ny.png | Negative Y |
+| Front  | my_sky_pz.png | Positive Z |
+| Back   | my_sky_nz.png | Negative Z |
 
 ### High-Res HDR Output
 
@@ -108,6 +126,7 @@ src/
 ├── layouts/        # Geometry logic
 │   ├── mod.rs      # Layout Factory
 │   ├── cross.rs    # Cross layout implementation
+│   ├── separate.rs # Separate layout implementation
 │   └── strip.rs    # Strip (H/V) implementation
 └── codecs/         # File Format encoders
     ├── mod.rs      # Encoder Factory
@@ -122,7 +141,10 @@ src/
 - [x] Multithreaded processing
 - [x] Bilinear Filtering
 - [x] PNG (LDR) & EXR (HDR) support
+- [x] Adding Separate layout outputing 6 faces
+- [ ] Better Agx implementation
 - [ ] ASTC Compression (Mobile)
+- [ ] DWAA/DWAB Compression
 - [ ] BC6H Compression (DirectX/High-End)
 - [ ] DDS Container support
 - [ ] Ktx2 Container support

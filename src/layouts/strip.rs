@@ -1,4 +1,4 @@
-use super::{SkyboxLayout, render_all_faces};
+use super::{LayoutOutput, SkyboxLayout, render_all_faces};
 use crate::math::CubeFace;
 use image::{ImageBuffer, Rgb32FImage};
 
@@ -13,7 +13,7 @@ pub struct StripLayout {
 }
 
 impl SkyboxLayout for StripLayout {
-    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> Rgb32FImage {
+    fn generate(&self, source: &Rgb32FImage, face_size: u32) -> LayoutOutput {
         let rendered_faces = render_all_faces(source, face_size);
 
         let (width, height) = match self.direction {
@@ -43,6 +43,6 @@ impl SkyboxLayout for StripLayout {
             }
         }
 
-        final_image
+        LayoutOutput::Single(final_image)
     }
 }
