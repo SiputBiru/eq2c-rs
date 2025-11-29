@@ -158,9 +158,6 @@ mod tests {
         assert!(result.z > 0.8); // Should be bright
         assert!(result.z <= 1.0); // Should be clamped
 
-        // AgX Desaturation check:
-        // A pure blue of 10.0 should bleed into Red/Green to create "White"
-        // So Red channel should NOT be 0.0 anymore.
         assert!(result.x > 0.0);
     }
 }
