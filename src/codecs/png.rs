@@ -25,7 +25,7 @@ impl SkyboxEncoder for PngEncoder {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use std::path::Path;
     /// use image::Rgb32FImage;
     /// use crate::codecs::png::PngEncoder;

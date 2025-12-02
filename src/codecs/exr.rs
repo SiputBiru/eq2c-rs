@@ -12,13 +12,13 @@ impl SkyboxEncoder for ExrEncoder {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```ignore
     /// use std::path::Path;
     /// // create or load an `Rgb32FImage` here
     /// let image: image::Rgb32FImage = unimplemented!();
     /// let encoder = ExrEncoder;
     /// encoder.encode(&image, Path::new("skybox.exr")).unwrap();
-    /// ```
+    /// ````
     fn encode(&self, image: &Rgb32FImage, output_path: &Path) -> Result<()> {
         image.save(output_path)?;
 

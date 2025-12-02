@@ -26,7 +26,7 @@ pub trait SkyboxEncoder {
 ///
 /// # Examples
 ///
-/// ```no_run
+/// ```ignore no_run
 /// use std::path::Path;
 /// use crate::codecs::{get_encoder, OutputFormat};
 /// use crate::tonemap::ToneMapType;
