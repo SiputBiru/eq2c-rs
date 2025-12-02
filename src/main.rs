@@ -52,6 +52,20 @@ enum LayoutArg {
     Separate,
 }
 
+/// Entry point for the CLI application that parses arguments, builds an eq2c configuration, runs the conversion, and exits with a status code on error.
+///
+/// On success prints the total execution time. On failure prints the error in red and exits with a specific status code depending on the error kind:
+/// - `Eq2cError::Io(_)` -> exit code 74
+/// - `Eq2cError::Image(_)` -> exit code 65
+/// - `Eq2cError::InvalidDimensions { .. }` -> exit code 64
+/// - other errors -> exit code 1
+///
+/// # Examples
+///
+/// ```no_run
+/// // Build and run the CLI binary, e.g.:
+/// // cargo run -- --input input.hdr --output out.png --format Png --layout Cross
+/// ```
 fn main() {
     let args = Cli::parse();
     let start = Instant::now();

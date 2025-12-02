@@ -23,6 +23,30 @@ pub struct Config {
     pub size: u32,
 }
 
+/// Runs the export pipeline: loads the input image, optionally reports very high brightness,
+/// generates the chosen layout, encodes the resulting buffer(s) with the selected tone-mapping
+/// and exposure, and writes output files.
+///
+/// On success, the function completes after writing one or more output files. On failure, an error
+/// is returned (for example, if the image cannot be opened or encoding fails).
+///
+/// # Examples
+///
+/// ```ignore
+/// // Build a Config for your run (fill fields appropriately)
+/// let config = Config {
+///     input: std::path::PathBuf::from("input.hdr"),
+///     output: std::path::PathBuf::from("output.png"),
+///     format: OutputFormat::Png,
+///     layout: LayoutType::Equirectangular,
+///     tonemap: ToneMapType::Reinhard,
+///     exposure: 1.0,
+///     size: 1024,
+/// };
+///
+/// // Execute the pipeline
+/// run(config).unwrap();
+/// ```
 pub fn run(config: Config) -> Result<()> {
     use rayon::prelude::*;
 
