@@ -13,6 +13,35 @@ pub struct PngEncoder {
 }
 
 impl SkyboxEncoder for PngEncoder {
+    /// Encodes an HDR RGB32F image to an 8-bit PNG file using the encoder's exposure and tonemap settings.
+    ///
+    /// On success, writes the resulting PNG to `output_path` and returns `Ok(())`.
+    ///
+    /// # Errors
+    ///
+    /// - Returns `Eq2cError::InvalidDimensions` if width*height or buffer size overflows, or if the source buffer is smaller than expected.
+    /// - Returns `Eq2cError::Image` with `ParameterErrorKind::DimensionMismatch` if an output image buffer cannot be created from the processed data.
+    /// - Propagates errors returned by the underlying image saving operation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::path::Path;
+    /// use image::Rgb32FImage;
+    /// use crate::codecs::png::PngEncoder;
+    /// use crate::tonemap::ToneMapType;
+    ///
+    /// // Create a 1x1 HDR image with a single white pixel.
+    /// let mut img: Rgb32FImage = Rgb32FImage::new(1, 1);
+    /// img.put_pixel(0, 0, image::Rgb([1.0f32, 1.0f32, 1.0f32]));
+    ///
+    /// let encoder = PngEncoder { tonemap: ToneMapType::Linear, exposure: 1.0 };
+    /// let out_path = Path::new("test_out.png");
+    ///
+    /// // Writes a PNG file; returns Ok(()) on success.
+    /// let result = encoder.encode(&img, out_path);
+    /// assert!(result.is_ok());
+    /// ```
     fn encode(&self, image: &Rgb32FImage, output_path: &Path) -> Result<()> {
         let width = image.width() as usize;
         let height = image.height() as usize;
