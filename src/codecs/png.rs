@@ -1,5 +1,6 @@
 use super::SkyboxEncoder;
 use crate::codecs::tonemap::{self, ToneMapType};
+use crate::error::{Eq2cError, Result};
 
 use glam::Vec3;
 use image::{ImageBuffer, Rgb, Rgb32FImage};
@@ -12,20 +13,59 @@ pub struct PngEncoder {
 }
 
 impl SkyboxEncoder for PngEncoder {
-    fn encode(&self, image: &Rgb32FImage, output_path: &Path) -> Result<(), String> {
+    /// Encodes an HDR RGB32F image to an 8-bit PNG file using the encoder's exposure and tonemap settings.
+    ///
+    /// On success, writes the resulting PNG to `output_path` and returns `Ok(())`.
+    ///
+    /// # Errors
+    ///
+    /// - Returns `Eq2cError::InvalidDimensions` if width*height or buffer size overflows, or if the source buffer is smaller than expected.
+    /// - Returns `Eq2cError::Image` with `ParameterErrorKind::DimensionMismatch` if an output image buffer cannot be created from the processed data.
+    /// - Propagates errors returned by the underlying image saving operation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::path::Path;
+    /// use image::Rgb32FImage;
+    /// use crate::codecs::png::PngEncoder;
+    /// use crate::tonemap::ToneMapType;
+    ///
+    /// // Create a 1x1 HDR image with a single white pixel.
+    /// let mut img: Rgb32FImage = Rgb32FImage::new(1, 1);
+    /// img.put_pixel(0, 0, image::Rgb([1.0f32, 1.0f32, 1.0f32]));
+    ///
+    /// let encoder = PngEncoder { tonemap: ToneMapType::Linear, exposure: 1.0 };
+    /// let out_path = Path::new("test_out.png");
+    ///
+    /// // Writes a PNG file; returns Ok(()) on success.
+    /// let result = encoder.encode(&img, out_path);
+    /// assert!(result.is_ok());
+    /// ```
+    fn encode(&self, image: &Rgb32FImage, output_path: &Path) -> Result<()> {
         let width = image.width() as usize;
         let height = image.height() as usize;
 
         let num_pixels = width
             .checked_mul(height)
-            .ok_or_else(|| "image dimensions too large".to_string())?;
+            .ok_or_else(|| Eq2cError::InvalidDimensions {
+                expected: "valid dimensions".to_string(),
+                found: "overflow".to_string(),
+            })?;
 
         let src = image.as_raw();
         let expected = num_pixels
             .checked_mul(3)
-            .ok_or_else(|| "image too large".to_string())?;
+            .ok_or_else(|| Eq2cError::InvalidDimensions {
+                expected: "valid buffer size".to_string(),
+                found: "overflow".to_string(),
+            })?;
+
         if src.len() < expected {
-            return Err("unexpected HDR buffer size".into());
+            return Err(Eq2cError::InvalidDimensions {
+                expected: format!("buffer size >= {}", expected),
+                found: format!("{}", src.len()),
+            });
         }
 
         let mut ldr_data = vec![0u8; num_pixels * 3];
@@ -43,7 +83,6 @@ impl SkyboxEncoder for PngEncoder {
                 let b = src[base + 2];
 
                 let hdr = Vec3::new(r, g, b) * exposure;
-
                 let mapped = tonemap::apply_tonemap(hdr, tonemap_type);
 
                 let final_color = Vec3::new(
@@ -58,9 +97,16 @@ impl SkyboxEncoder for PngEncoder {
             });
 
         let out: ImageBuffer<Rgb<u8>, Vec<u8>> =
-            ImageBuffer::from_raw(width as u32, height as u32, ldr_data)
-                .ok_or_else(|| "failed to create output image buffer".to_string())?;
+            ImageBuffer::from_raw(width as u32, height as u32, ldr_data).ok_or_else(|| {
+                Eq2cError::Image(image::ImageError::Parameter(
+                    image::error::ParameterError::from_kind(
+                        image::error::ParameterErrorKind::DimensionMismatch,
+                    ),
+                ))
+            })?;
 
-        out.save(output_path).map_err(|e| e.to_string())
+        out.save(output_path)?;
+
+        Ok(())
     }
 }

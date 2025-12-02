@@ -2,7 +2,7 @@ use clap::{Parser, ValueEnum};
 use std::path::PathBuf;
 use std::time::Instant;
 
-use eq2c::{self, codecs::ToneMapType};
+use eq2c::{self, Eq2cError, codecs::ToneMapType};
 
 #[derive(Parser)]
 #[command(
@@ -52,6 +52,20 @@ enum LayoutArg {
     Separate,
 }
 
+/// Entry point for the CLI application that parses arguments, builds an eq2c configuration, runs the conversion, and exits with a status code on error.
+///
+/// On success prints the total execution time. On failure prints the error in red and exits with a specific status code depending on the error kind:
+/// - `Eq2cError::Io(_)` -> exit code 74
+/// - `Eq2cError::Image(_)` -> exit code 65
+/// - `Eq2cError::InvalidDimensions { .. }` -> exit code 64
+/// - other errors -> exit code 1
+///
+/// # Examples
+///
+/// ```no_run
+/// // Build and run the CLI binary, e.g.:
+/// // cargo run -- --input input.hdr --output out.png --format Png --layout Cross
+/// ```
 fn main() {
     let args = Cli::parse();
     let start = Instant::now();
@@ -75,8 +89,14 @@ fn main() {
     };
 
     if let Err(e) = eq2c::run(config) {
-        eprintln!("Error: {e}");
-        std::process::exit(1);
+        eprintln!("\x1b[31mError:\x1b[0m {}", e);
+
+        match e {
+            Eq2cError::Io(_) => std::process::exit(74),
+            Eq2cError::Image(_) => std::process::exit(65),
+            Eq2cError::InvalidDimensions { .. } => std::process::exit(64),
+            _ => std::process::exit(1),
+        }
     }
 
     println!("Total Time: {:?}", start.elapsed());
